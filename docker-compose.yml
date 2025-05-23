@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ewallet_postgres
+    environment:
+      POSTGRES_DB: ewallet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5433:5432"  # Ganti dari 5432 ke 5433
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./example_data.sql:/docker-entrypoint-initdb.d/example_data.sql
+    networks:
+      - ewallet_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ewallet_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: ewallet_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - ewallet_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: ewallet_app
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432  # Port internal container tetap 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: ewallet_db
+      DB_SSLMODE: disable
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      JWT_SECRET: your-super-secret-jwt-key-here-make-it-long-and-secure
+      SERVER_PORT: 8080
+      GIN_MODE: release
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - ewallet_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  ewallet_network:
+    driver: bridge

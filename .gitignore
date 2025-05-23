@@ -1,0 +1,69 @@
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+app
+e-wallet
+server
+
+# Go test files
+*.test
+*.out
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Configuration with secrets
+config.json
+config.yaml
+*.pem
+*.key
+*.crt
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+vendor/
+
+# Build output
+build/
+dist/
+tmp/
+
+# Uploads
+uploads/
+storage/
+media/
+
+# Local development
+.local/
+dev.db
+test.db
+
+# Docker
+docker-compose.override.yml
+
+# Air live reload
+tmp/
