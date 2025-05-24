@@ -14,7 +14,7 @@ Sistem backend RESTful API untuk simulasi e-wallet sederhana dengan fitur regist
 
 ## Fitur
 
-### ✅ Halaman yang Sudah Selesai
+### ✅ API yang Sudah Selesai
 
 1. **API Register** - `POST /register`
    - Mendaftarkan pengguna baru dengan UUID
@@ -58,22 +58,28 @@ Sistem backend RESTful API untuk simulasi e-wallet sederhana dengan fitur regist
 - **Database Transactions** - Konsistensi data
 - **Background Workers** - Asynchronous processing
 
-## Instalasi dan Menjalankan Project
 
-### Prerequisites
+## 📦 Installation & Dependencies
 
-- Docker dan Docker Compose
-- Go 1.21+ (untuk development)
-- Air (untuk live reload development)
+## Prerequisites
+
+- **Docker** dan **Docker Compose**
+- **Go 1.21+** (untuk development)
+- **Air** (untuk live reload development)
+- **PostgreSQL** (untuk local development)
+- **RabbitMQ** (untuk local development)
+
+## Quick Start
 
 ### 1. Clone Repository
 
 ```bash
 git clone <repository-url>
-cd e-wallet-api
+cd e-wallet-backend
 ```
 
 ### 2. Setup Environment
+
 ```bash
 # Copy environment file
 cp .env.example .env
@@ -82,39 +88,78 @@ cp .env.example .env
 nano .env
 ```
 
-### 3. Jalankan dengan Docker Compose
+### 3. Start Application
 ```bash
-# Build dan jalankan semua services
-docker-compose up --build
+# Quick start dengan Docker (Recommended)
+make docker-up
 
-# Atau jalankan di background
-docker-compose up --build -d
+# Atau manual
+docker-compose up -d --build
+Ï
 ```
-
-### 4. Verifikasi Installation
+### 4. Verify Installation
 ```bash
-# Cek status container
-docker-compose ps
+# Cek status services
+make status
 
 # Test API health check
 curl http://localhost:8080/health
+Ï
 ```
-### 5. Development Mode(Optional)
-```bash
-# Install Air untuk live reload
-go install github.com/cosmtrek/air@latest
 
-# Jalankan database services saja
-docker-compose up postgres rabbitmq -d
+## Cara Menjalankan Aplikasi
 
-# Jalankan aplikasi dengan live reload
-air
-```
-### 6. Stop Services
+### Full Docker Environment (Recommended for Production)
 ```bash
-# Stop semua services
+# Start semua services
+make docker-up
+# atau
+docker-compose up -d --build
+
+# Lihat logs real-time
+make docker-logs
+# atau
+docker-compose logs -f
+
+# Lihat status services
+make status
+# atau
+docker-compose ps
+
+# Stop services
+make docker-down
+# atau
 docker-compose down
+Ï
+```
 
-# Stop dan hapus data (HATI-HATI)
-docker-compose down -v
+### Access Point
+```bash
+API: http://localhost:8080
+RabbitMQ Management: http://localhost:15672 (guest/guest)
+PostgreSQL: localhost:5433
+```
+
+### Full Local Development
+```bash
+# Prerequisites: Install PostgreSQL dan RabbitMQ di local
+
+# MacOS dengan Homebrew
+brew install postgresql rabbitmq
+brew services start postgresql
+brew services start rabbitmq
+
+# Ubuntu/Debian
+sudo apt-get install postgresql rabbitmq-server
+sudo systemctl start postgresql
+sudo systemctl start rabbitmq-server
+
+# Windows (dengan Chocolatey)
+choco install postgresql rabbitmq
+
+# Jalankan aplikasi
+make dev-local
+
+# atau
+air
 ```
