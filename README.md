@@ -58,9 +58,6 @@ Sistem backend RESTful API untuk simulasi e-wallet sederhana dengan fitur regist
 - **Database Transactions** - Konsistensi data
 - **Background Workers** - Asynchronous processing
 
-
-## 📦 Installation & Dependencies
-
 ## Prerequisites
 
 - **Docker** dan **Docker Compose**
@@ -88,7 +85,25 @@ cp .env.example .env
 nano .env
 ```
 
-### 3. Start Application
+### 3. Install Dependencies
+```bash
+Option A: Menggunakan Docker (Recommended - No Go Installation Required)
+# Semua dependencies sudah ada di Docker image
+# Tidak perlu install Go dependencies secara manual
+docker-compose up --build -d
+
+Option B: Development dengan Go Modules
+# Download Go dependencies
+go mod download
+
+# Verify dependencies
+go mod verify
+
+# Install development tools
+go install github.com/cosmtrek/air@latest
+```
+
+### 4. Start Application
 ```bash
 # Quick start dengan Docker (Recommended)
 make docker-up
@@ -97,7 +112,7 @@ make docker-up
 docker-compose up -d --build
 Ï
 ```
-### 4. Verify Installation
+### 5. Verify Installation
 ```bash
 # Cek status services
 make status
@@ -162,4 +177,5 @@ make dev-local
 
 # atau
 air
+
 ```
