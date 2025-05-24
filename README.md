@@ -145,7 +145,6 @@ docker-compose ps
 make docker-down
 # atau
 docker-compose down
-Ï
 ```
 
 ### Access Point
