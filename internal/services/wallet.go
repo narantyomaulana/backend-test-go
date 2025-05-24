@@ -43,13 +43,11 @@ func (s *WalletService) TopUp(userID uuid.UUID, amount int64) (*models.TopUp, er
 	balanceBefore := user.Balance
 	balanceAfter := balanceBefore + amount
 
-	// Update user balance
 	if err := tx.Model(&user).Update("balance", balanceAfter).Error; err != nil {
 		tx.Rollback()
 		return nil, errors.New("gagal mengupdate saldo")
 	}
 
-	// Create top up record
 	topUp := models.TopUp{
 		ID:            uuid.New(),
 		UserID:        userID,
@@ -63,7 +61,6 @@ func (s *WalletService) TopUp(userID uuid.UUID, amount int64) (*models.TopUp, er
 		return nil, errors.New("gagal membuat record top up")
 	}
 
-	// Create transaction record
 	transaction := models.Transaction{
 		ID:              uuid.New(),
 		UserID:          userID,
@@ -119,7 +116,6 @@ func (s *WalletService) Payment(userID uuid.UUID, amount int64, remarks string) 
 		return nil, errors.New("gagal mengupdate saldo")
 	}
 
-	// Create payment record
 	payment := models.Payment{
 		ID:            uuid.New(),
 		UserID:        userID,
@@ -134,7 +130,6 @@ func (s *WalletService) Payment(userID uuid.UUID, amount int64, remarks string) 
 		return nil, errors.New("gagal membuat record pembayaran")
 	}
 
-	// Create transaction record
 	transaction := models.Transaction{
 		ID:              uuid.New(),
 		UserID:          userID,
@@ -182,7 +177,6 @@ func (s *WalletService) InitiateTransfer(fromUserID, toUserID uuid.UUID, amount 
 		return nil, errors.New("saldo tidak cukup")
 	}
 
-	// Begin transaction for sender
 	tx := database.GetDB().Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -199,7 +193,6 @@ func (s *WalletService) InitiateTransfer(fromUserID, toUserID uuid.UUID, amount 
 		return nil, errors.New("gagal mengupdate saldo pengirim")
 	}
 
-	// Create transfer record
 	transfer := models.Transfer{
 		ID:            uuid.New(),
 		FromUserID:    fromUserID,
@@ -216,7 +209,6 @@ func (s *WalletService) InitiateTransfer(fromUserID, toUserID uuid.UUID, amount 
 		return nil, errors.New("gagal membuat record transfer")
 	}
 
-	// Create transaction record for sender
 	transaction := models.Transaction{
 		ID:              uuid.New(),
 		UserID:          fromUserID,
@@ -235,7 +227,6 @@ func (s *WalletService) InitiateTransfer(fromUserID, toUserID uuid.UUID, amount 
 
 	tx.Commit()
 
-	// Send to queue for background processing
 	message := rabbitmq.TransferMessage{
 		TransferID: transfer.ID.String(),
 		FromUserID: fromUserID.String(),
@@ -246,7 +237,6 @@ func (s *WalletService) InitiateTransfer(fromUserID, toUserID uuid.UUID, amount 
 
 	if err := s.rabbitMQ.PublishMessage("transfer_queue", message); err != nil {
 		log.Printf("Failed to publish transfer message: %v", err)
-		// Note: Transfer already deducted from sender, will be processed by background worker
 	}
 
 	return &transfer, nil
@@ -268,13 +258,11 @@ func (s *WalletService) ProcessTransfer(message rabbitmq.TransferMessage) error 
 		return err
 	}
 
-	// Get transfer record
 	var transfer models.Transfer
 	if err := database.GetDB().Where("id = ?", transferID).First(&transfer).Error; err != nil {
 		return err
 	}
 
-	// Get recipient user
 	var toUser models.User
 	if err := database.GetDB().Where("id = ?", toUserID).First(&toUser).Error; err != nil {
 		return err
@@ -285,7 +273,6 @@ func (s *WalletService) ProcessTransfer(message rabbitmq.TransferMessage) error 
 		return err
 	}
 
-	// Begin transaction
 	tx := database.GetDB().Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -293,20 +280,17 @@ func (s *WalletService) ProcessTransfer(message rabbitmq.TransferMessage) error 
 		}
 	}()
 
-	// Update recipient balance
 	newBalance := toUser.Balance + message.Amount
 	if err := tx.Model(&toUser).Update("balance", newBalance).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	// Update transfer status
 	if err := tx.Model(&transfer).Update("status", "SUCCESS").Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	// Create transaction record for recipient
 	transaction := models.Transaction{
 		ID:              uuid.New(),
 		UserID:          toUserID,

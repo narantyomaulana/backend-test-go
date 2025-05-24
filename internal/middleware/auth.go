@@ -18,14 +18,12 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
-		// Check if header starts with "Bearer "
 		if !strings.HasPrefix(authHeader, "Bearer ") {
 			utils.UnauthorizedResponse(c, "Invalid authorization header format")
 			c.Abort()
 			return
 		}
 
-		// Extract token
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token == "" {
 			utils.UnauthorizedResponse(c, "Token required")
@@ -33,7 +31,6 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
-		// Validate token
 		claims, err := utils.ValidateToken(token, cfg.JWT.Secret)
 		if err != nil {
 			utils.UnauthorizedResponse(c, "Invalid or expired token")
@@ -41,7 +38,6 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
-		// Set user ID in context
 		c.Set("user_id", claims.UserID)
 		c.Next()
 	}

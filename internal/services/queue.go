@@ -27,6 +27,5 @@ func (s *QueueService) handleTransferMessage(message rabbitmq.TransferMessage) {
 	
 	if err := s.walletService.ProcessTransfer(message); err != nil {
 		log.Printf("Failed to process transfer %s: %v", message.TransferID, err)
-		// In production, you might want to implement retry logic or dead letter queue
 	}
 }

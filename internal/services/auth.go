@@ -19,7 +19,7 @@ func NewAuthService() *AuthService {
 }
 
 func (s *AuthService) Register(req RegisterRequest) (*models.User, error) {
-	// Validate input
+
 	if !utils.ValidateName(req.FirstName) || !utils.ValidateName(req.LastName) {
 		return nil, errors.New("nama firstname atau lastname tidak boleh kosong")
 	}
@@ -32,7 +32,6 @@ func (s *AuthService) Register(req RegisterRequest) (*models.User, error) {
 		return nil, errors.New("PIN harus 6 digit angka")
 	}
 
-	// Check if phone number already exists
 	var existingUser models.User
 	if err := database.GetDB().Where("phone_number = ?", req.PhoneNumber).First(&existingUser).Error; err == nil {
 		return nil, errors.New("nomor telepon sudah terdaftar")

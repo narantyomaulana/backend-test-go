@@ -67,7 +67,6 @@ type Transaction struct {
 	User            User      `gorm:"foreignKey:UserID"`
 }
 
-// BeforeCreate hook untuk User
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	if u.ID == uuid.Nil {
 		u.ID = uuid.New()
@@ -75,7 +74,6 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-// BeforeCreate hook untuk TopUp
 func (t *TopUp) BeforeCreate(tx *gorm.DB) error {
 	if t.ID == uuid.Nil {
 		t.ID = uuid.New()
@@ -83,7 +81,6 @@ func (t *TopUp) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-// BeforeCreate hook untuk Payment
 func (p *Payment) BeforeCreate(tx *gorm.DB) error {
 	if p.ID == uuid.Nil {
 		p.ID = uuid.New()
@@ -91,7 +88,6 @@ func (p *Payment) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-// BeforeCreate hook untuk Transfer
 func (t *Transfer) BeforeCreate(tx *gorm.DB) error {
 	if t.ID == uuid.Nil {
 		t.ID = uuid.New()
@@ -99,7 +95,6 @@ func (t *Transfer) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-// BeforeCreate hook untuk Transaction
 func (t *Transaction) BeforeCreate(tx *gorm.DB) error {
 	if t.ID == uuid.Nil {
 		t.ID = uuid.New()

@@ -39,12 +39,12 @@ func NewRabbitMQ(url string) (*RabbitMQ, error) {
 
 func (r *RabbitMQ) DeclareQueue(queueName string) error {
 	_, err := r.channel.QueueDeclare(
-		queueName, // name
-		true,      // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
+		queueName,
+		true,     
+		false,   
+		false, 
+		false,
+		nil, 
 	)
 	return err
 }
@@ -57,9 +57,9 @@ func (r *RabbitMQ) PublishMessage(queueName string, message TransferMessage) err
 
 	err = r.channel.Publish(
 		"",        // exchange
-		queueName, // routing key
-		false,     // mandatory
-		false,     // immediate
+		queueName,
+		false,   
+		false,
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        body,
@@ -70,13 +70,13 @@ func (r *RabbitMQ) PublishMessage(queueName string, message TransferMessage) err
 
 func (r *RabbitMQ) ConsumeMessages(queueName string, handler func(TransferMessage)) error {
 	msgs, err := r.channel.Consume(
-		queueName, // queue
-		"",        // consumer
-		true,      // auto-ack
-		false,     // exclusive
-		false,     // no-local
-		false,     // no-wait
-		nil,       // args
+		queueName,
+		"",      
+		true, 
+		false,
+		false,
+		false,
+		nil,
 	)
 	if err != nil {
 		return err
